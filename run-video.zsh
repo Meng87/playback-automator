@@ -27,7 +27,7 @@ function play_video {
     else
         adb shell am start -a android.intent.action.VIEW -d $url
     fi
-
+    sleep 6
     sleep $playback_time
 
     adb shell pm clear $package # Clear app data
@@ -106,6 +106,7 @@ function play_netflix_tv {
 
     # Play video
     adb shell am start -c android.intent.category.LEANBACK_LAUNCHER -a android.intent.action.VIEW -d $url -e source 30 -n com.netflix.ninja/.MainActivity
+    sleep 4
     sleep $playback_time
 
     # Clear app data
