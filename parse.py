@@ -27,6 +27,7 @@ for elem in root.iter():
             midpoint_x = int((int(left_top[0]) + int(right_btm[0]))/2)
             midpoint_y = int((int(left_top[1]) + int(right_btm[1]))/2)
             print(midpoint_x, midpoint_y)
+            break
 
 
 

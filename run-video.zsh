@@ -47,29 +47,42 @@ function play_netflix {
     adb shell am start -n com.netflix.mediaclient/com.netflix.mediaclient.acquisition.screens.signupContainer.SignupNativeActivity
 
     # Navigate to log in page
+    sleep 2
     adb shell uiautomator dump
     adb pull /sdcard/window_dump.xml $tmp_folder/mainpage.xml
-    python3 $tmp_folder/parse.py mainpage.xml "SIGN IN" | xargs -I {} adb shell input tap {}
+    python3 $tmp_folder/parse.py mainpage.xml "LOG IN" | xargs -I {} adb shell input tap {}
 
     # Log in
     adb shell input text $username
     adb shell input keyevent KEYCODE_TAB
     adb shell input text $pw
-
-    adb shell uiautomator dump
-    adb pull /sdcard/window_dump.xml $tmp_folder/login.xml
-    python3 $tmp_folder/parse.py login.xml "Sign In" | xargs -I {} adb shell input tap {}
+    adb shell input keyevent KEYCODE_TAB
+    adb shell input keyevent KEYCODE_TAB
+    adb shell input keyevent KEYCODE_ENTER
+    sleep 5
 
     # Play video
     adb shell am start -a android.intent.action.VIEW -d $url
     sleep $playback_time
+
+    # Shift back to start
+    adb shell input tap 500 500
+    adb shell uiautomator dump
+    adb pull /sdcard/window_dump.xml $tmp_folder/goback.xml
+    cmd_to_repeat="python3 $tmp_folder/parse.py goback.xml '10'"
+    output_text=$(eval $cmd_to_repeat)
+    repeat_count=$(($playback_time / 10 + 1))
+    for ((i=1; i<=$repeat_count; i++)); do
+        adb shell input tap "$output_text"
+        sleep 1
+    done
 
     # Clear app data
     adb shell pm clear com.netflix.mediaclient
 
     # Remove files from pc
     rm $tmp_folder/mainpage.xml
-    rm $tmp_folder/login.xml
+    rm $tmp_folder/goback.xml
 }
 
 function play_netflix_tv {
@@ -120,4 +133,4 @@ function play_netflix_tv {
 
 # TV
 # play_video com.google.android.youtube.tv $youtube_url $youtube_time 1
-play_netflix_tv $netflix_username $netflix_password $netflix_url $netflix_time
+# play_netflix_tv $netflix_username $netflix_password $netflix_url $netflix_time
