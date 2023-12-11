@@ -55,6 +55,9 @@ function play_netflix {
     # Log in
     adb shell input text $username
     adb shell input keyevent KEYCODE_TAB
+    adb shell input keyevent KEYCODE_TAB
+    adb shell input keyevent KEYCODE_ENTER
+    sleep 1
     adb shell input text $pw
     adb shell input keyevent KEYCODE_TAB
     adb shell input keyevent KEYCODE_TAB
@@ -65,24 +68,11 @@ function play_netflix {
     adb shell am start -a android.intent.action.VIEW -d $url
     sleep $playback_time
 
-    # Shift back to start
-    adb shell input tap 500 500
-    adb shell uiautomator dump
-    adb pull /sdcard/window_dump.xml $tmp_folder/goback.xml
-    cmd_to_repeat="python3 $tmp_folder/parse.py goback.xml '10'"
-    output_text=$(eval $cmd_to_repeat)
-    repeat_count=$(($playback_time / 10 + 1))
-    for ((i=1; i<=$repeat_count; i++)); do
-        adb shell input tap "$output_text"
-        sleep 1
-    done
-
     # Clear app data
     adb shell pm clear com.netflix.mediaclient
 
     # Remove files from pc
     rm $tmp_folder/mainpage.xml
-    rm $tmp_folder/goback.xml
 }
 
 function play_netflix_tv {
